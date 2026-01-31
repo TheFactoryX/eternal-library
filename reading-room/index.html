@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>永恒图书馆 | The Eternal Library</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0a;
+            --text: #e0e0e0;
+            --muted: #666;
+            --accent: #8b7355;
+            --glow: rgba(139, 115, 85, 0.3);
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: normal;
+            letter-spacing: 0.2em;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        .status {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; box-shadow: 0 0 5px var(--glow); }
+            50% { opacity: 1; box-shadow: 0 0 15px var(--glow); }
+        }
+
+        .tomes {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .tome {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(139, 115, 85, 0.2);
+            padding: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tome:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--accent);
+            box-shadow: 0 0 30px var(--glow);
+        }
+
+        .tome-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .tome-synopsis {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .tome-meta {
+            display: flex;
+            gap: 30px;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .tome-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Reading View */
+        .reading-view {
+            display: none;
+        }
+
+        .reading-view.active {
+            display: block;
+        }
+
+        .tomes-view.hidden {
+            display: none;
+        }
+
+        .back-btn {
+            color: var(--muted);
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 40px;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            color: var(--accent);
+        }
+
+        .reading-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .reading-title {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .chapters {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .chapter {
+            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chapter:hover, .chapter.active {
+            border-left-color: var(--accent);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .chapter-num {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 5px;
+        }
+
+        .chapter-preview {
+            color: var(--text);
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        .content {
+            padding: 40px 0;
+            border-top: 1px solid rgba(139, 115, 85, 0.2);
+        }
+
+        .content-header {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .content-body {
+            font-size: 1.1rem;
+            line-height: 2;
+            text-align: justify;
+        }
+
+        .content-body p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--muted);
+            padding: 60px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(139, 115, 85, 0.1);
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>永恒图书馆</h1>
+            <p class="subtitle">The Eternal Library</p>
+            <div class="status">
+                <span class="pulse"></span>
+                <span>图书管理员正在书写...</span>
+            </div>
+        </header>
+
+        <main class="tomes-view" id="tomes-view">
+            <div class="tomes" id="tomes-list">
+                <div class="loading">正在加载书卷...</div>
+            </div>
+        </main>
+
+        <main class="reading-view" id="reading-view">
+            <div class="back-btn" onclick="showTomes()">← 返回书架</div>
+            <div class="reading-header">
+                <h2 class="reading-title" id="reading-title"></h2>
+                <p class="subtitle" id="reading-synopsis"></p>
+            </div>
+            <div class="chapters" id="chapters-list"></div>
+            <div class="content" id="content-area">
+                <div class="content-header" id="content-header"></div>
+                <div class="content-body" id="content-body"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>书页每 15 分钟生长一次。永不停止。</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/TheFactoryX/eternal-library">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        let library = null;
+        let currentTome = null;
+        let pagesCache = {};
+
+        async function loadLibrary() {
+            try {
+                const response = await fetch('./library.json');
+                library = await response.json();
+                renderTomes();
+            } catch (e) {
+                document.getElementById('tomes-list').innerHTML =
+                    '<div class="loading">图书馆尚未开放...</div>';
+            }
+        }
+
+        function renderTomes() {
+            const container = document.getElementById('tomes-list');
+            if (!library || !library.tomes || library.tomes.length === 0) {
+                container.innerHTML = '<div class="loading">书架上还没有书卷...</div>';
+                return;
+            }
+
+            container.innerHTML = library.tomes.map(tome => `
+                <div class="tome" onclick="openTome('${tome.id}')">
+                    <h3 class="tome-title">${tome.title}</h3>
+                    <p class="tome-synopsis">${tome.synopsis}</p>
+                    <div class="tome-meta">
+                        <span>📖 ${tome.pages} 章</span>
+                        <span>🌐 ${tome.language === 'zh' ? '中文' : 'English'}</span>
+                        <span>🕐 ${formatTime(tome.updated_at)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function openTome(tomeId) {
+            currentTome = library.tomes.find(t => t.id === tomeId);
+            if (!currentTome) return;
+
+            document.getElementById('tomes-view').classList.add('hidden');
+            document.getElementById('reading-view').classList.add('active');
+
+            document.getElementById('reading-title').textContent = currentTome.title;
+            document.getElementById('reading-synopsis').textContent = currentTome.synopsis;
+
+            await loadChapters(tomeId);
+        }
+
+        async function loadChapters(tomeId) {
+            const container = document.getElementById('chapters-list');
+            container.innerHTML = '<div class="loading">加载章节目录...</div>';
+
+            const chapters = [];
+            for (let i = 1; i <= currentTome.pages; i++) {
+                chapters.push({ num: i, tomeId });
+            }
+
+            container.innerHTML = chapters.map(ch => `
+                <div class="chapter" onclick="loadPage('${ch.tomeId}', ${ch.num})" id="chapter-${ch.num}">
+                    <div class="chapter-num">${currentTome.language === 'zh' ? '第 ' + ch.num + ' 章' : 'Letter ' + ch.num}</div>
+                    <div class="chapter-preview">点击阅读...</div>
+                </div>
+            `).join('');
+
+            // Auto-load first chapter
+            if (chapters.length > 0) {
+                loadPage(tomeId, 1);
+            }
+        }
+
+        async function loadPage(tomeId, pageNum) {
+            const cacheKey = `${tomeId}_${pageNum}`;
+
+            // Highlight active chapter
+            document.querySelectorAll('.chapter').forEach(el => el.classList.remove('active'));
+            document.getElementById(`chapter-${pageNum}`)?.classList.add('active');
+
+            const headerEl = document.getElementById('content-header');
+            const bodyEl = document.getElementById('content-body');
+
+            if (pagesCache[cacheKey]) {
+                renderPage(pagesCache[cacheKey], pageNum);
+                return;
+            }
+
+            headerEl.textContent = '加载中...';
+            bodyEl.innerHTML = '';
+
+            try {
+                const paddedNum = String(pageNum).padStart(3, '0');
+                const response = await fetch(`./stacks/${tomeId}/page_${paddedNum}.md`);
+                if (!response.ok) throw new Error('Page not found');
+
+                const content = await response.text();
+                pagesCache[cacheKey] = content;
+                renderPage(content, pageNum);
+            } catch (e) {
+                headerEl.textContent = '';
+                bodyEl.innerHTML = '<p style="color: var(--muted);">这一页还未被书写...</p>';
+            }
+        }
+
+        function renderPage(content, pageNum) {
+            const headerEl = document.getElementById('content-header');
+            const bodyEl = document.getElementById('content-body');
+
+            // Parse markdown-like content
+            const lines = content.split('\n');
+            let timestamp = '';
+            let body = [];
+            let inBody = false;
+
+            for (const line of lines) {
+                if (line.startsWith('> 书写于') || line.startsWith('> Written at')) {
+                    timestamp = line.replace('> ', '');
+                } else if (line === '---') {
+                    inBody = true;
+                } else if (inBody && line.trim()) {
+                    body.push(line);
+                }
+            }
+
+            headerEl.textContent = timestamp;
+            bodyEl.innerHTML = body.map(p => `<p>${p}</p>`).join('');
+        }
+
+        function showTomes() {
+            document.getElementById('reading-view').classList.remove('active');
+            document.getElementById('tomes-view').classList.remove('hidden');
+            currentTome = null;
+        }
+
+        function formatTime(isoString) {
+            if (!isoString) return '尚未更新';
+            const date = new Date(isoString);
+            return date.toLocaleString('zh-CN', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Initialize
+        loadLibrary();
+
+        // Auto-refresh every 5 minutes
+        setInterval(loadLibrary, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

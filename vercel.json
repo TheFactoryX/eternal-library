@@ -1,0 +1,16 @@
+{
+  "outputDirectory": ".",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "s-maxage=60, stale-while-revalidate" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/reading-room/index.html" },
+    { "source": "/index.html", "destination": "/reading-room/index.html" },
+    { "source": "/library.json", "destination": "/reading-room/library.json" }
+  ]
+}
