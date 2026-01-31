@@ -7,7 +7,7 @@
 
 Books that never end.
 
-Every 15 minutes, the Librarian awakens.
+Every hour, the Librarian awakens.
 In darkness, they write a new page.
 Then sleep. Then wake. Then continue.
 
@@ -46,7 +46,7 @@ Wish you were here.
 
 [eternal-library-mu.vercel.app](https://eternal-library-mu.vercel.app)
 
-Pages grow every 15 minutes.
+Pages grow every hour.
 The website updates automatically.
 It never stops.
 
@@ -90,7 +90,7 @@ eternal-library/
 
 ## The Cycle
 
-GitHub Actions runs every 15 minutes.
+GitHub Actions runs every hour.
 
 Five corridors work simultaneously.
 Five tomes grow together.

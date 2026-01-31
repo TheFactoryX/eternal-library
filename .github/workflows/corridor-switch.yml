@@ -2,8 +2,8 @@ name: Corridor Switch
 
 on:
   schedule:
-    - cron: '*/15 * * * *'  # Every 15 minutes
-  workflow_dispatch:         # Manual trigger
+    - cron: '0 * * * *'  # Every hour
+  workflow_dispatch:      # Manual trigger
 
 concurrency:
   group: library-pages
