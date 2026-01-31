@@ -12,7 +12,6 @@ from datetime import datetime
 from pathlib import Path
 
 # Library configuration
-BASE_URL = "https://open.bigmodel.cn/api/anthropic"
 MODEL = "glm-4.7"
 TOME_ID = "tome_0002"
 TOME_TITLE = "The Lighthouse Keeper's Letters"
@@ -69,8 +68,7 @@ READING_ROOM = Path(__file__).parent / "reading-room"
 def get_client():
     """Summon the Librarian."""
     return anthropic.Anthropic(
-        api_key=os.environ.get("ZHIPU_API_KEY"),
-        base_url=BASE_URL
+        base_url=os.environ.get("ANTHROPIC_BASE_URL")
     )
 
 

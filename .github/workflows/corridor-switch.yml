@@ -21,9 +21,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Corridor 0 (中文书卷)
+      - name: Run Corridor 0 (Chinese Tome)
         env:
-          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
         run: |
           for i in 1 2 3; do
             python corridor0.py && break || sleep 10
@@ -31,7 +32,8 @@ jobs:
 
       - name: Run Corridor 1 (English Tome)
         env:
-          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
         run: |
           for i in 1 2 3; do
             python corridor1.py && break || sleep 10

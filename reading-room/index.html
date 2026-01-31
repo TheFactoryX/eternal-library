@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>永恒图书馆 | The Eternal Library</title>
+    <title>The Eternal Library</title>
     <style>
         * {
             margin: 0;
@@ -235,22 +235,22 @@
 <body>
     <div class="container">
         <header>
-            <h1>永恒图书馆</h1>
-            <p class="subtitle">The Eternal Library</p>
+            <h1>The Eternal Library</h1>
+            <p class="subtitle">Books that never end</p>
             <div class="status">
                 <span class="pulse"></span>
-                <span>图书管理员正在书写...</span>
+                <span>The Librarian is writing...</span>
             </div>
         </header>
 
         <main class="tomes-view" id="tomes-view">
             <div class="tomes" id="tomes-list">
-                <div class="loading">正在加载书卷...</div>
+                <div class="loading">Loading tomes...</div>
             </div>
         </main>
 
         <main class="reading-view" id="reading-view">
-            <div class="back-btn" onclick="showTomes()">← 返回书架</div>
+            <div class="back-btn" onclick="showTomes()">← Back to shelf</div>
             <div class="reading-header">
                 <h2 class="reading-title" id="reading-title"></h2>
                 <p class="subtitle" id="reading-synopsis"></p>
@@ -263,7 +263,7 @@
         </main>
 
         <footer>
-            <p>书页每 15 分钟生长一次。永不停止。</p>
+            <p>Pages grow every 15 minutes. It never stops.</p>
             <p style="margin-top: 10px;">
                 <a href="https://github.com/TheFactoryX/eternal-library">GitHub</a>
             </p>
@@ -282,14 +282,14 @@
                 renderTomes();
             } catch (e) {
                 document.getElementById('tomes-list').innerHTML =
-                    '<div class="loading">图书馆尚未开放...</div>';
+                    '<div class="loading">The library has not yet opened...</div>';
             }
         }
 
         function renderTomes() {
             const container = document.getElementById('tomes-list');
             if (!library || !library.tomes || library.tomes.length === 0) {
-                container.innerHTML = '<div class="loading">书架上还没有书卷...</div>';
+                container.innerHTML = '<div class="loading">No tomes on the shelf yet...</div>';
                 return;
             }
 
@@ -298,8 +298,8 @@
                     <h3 class="tome-title">${tome.title}</h3>
                     <p class="tome-synopsis">${tome.synopsis}</p>
                     <div class="tome-meta">
-                        <span>📖 ${tome.pages} 章</span>
-                        <span>🌐 ${tome.language === 'zh' ? '中文' : 'English'}</span>
+                        <span>📖 ${tome.pages} ${tome.pages === 1 ? 'chapter' : 'chapters'}</span>
+                        <span>🌐 ${tome.language === 'zh' ? 'Chinese' : 'English'}</span>
                         <span>🕐 ${formatTime(tome.updated_at)}</span>
                     </div>
                 </div>
@@ -321,7 +321,7 @@
 
         async function loadChapters(tomeId) {
             const container = document.getElementById('chapters-list');
-            container.innerHTML = '<div class="loading">加载章节目录...</div>';
+            container.innerHTML = '<div class="loading">Loading chapters...</div>';
 
             const chapters = [];
             for (let i = 1; i <= currentTome.pages; i++) {
@@ -330,8 +330,8 @@
 
             container.innerHTML = chapters.map(ch => `
                 <div class="chapter" onclick="loadPage('${ch.tomeId}', ${ch.num})" id="chapter-${ch.num}">
-                    <div class="chapter-num">${currentTome.language === 'zh' ? '第 ' + ch.num + ' 章' : 'Letter ' + ch.num}</div>
-                    <div class="chapter-preview">点击阅读...</div>
+                    <div class="chapter-num">${currentTome.language === 'zh' ? 'Chapter ' + ch.num : 'Letter ' + ch.num}</div>
+                    <div class="chapter-preview">Click to read...</div>
                 </div>
             `).join('');
 
@@ -356,7 +356,7 @@
                 return;
             }
 
-            headerEl.textContent = '加载中...';
+            headerEl.textContent = 'Loading...';
             bodyEl.innerHTML = '';
 
             try {
@@ -369,7 +369,7 @@
                 renderPage(content, pageNum);
             } catch (e) {
                 headerEl.textContent = '';
-                bodyEl.innerHTML = '<p style="color: var(--muted);">这一页还未被书写...</p>';
+                bodyEl.innerHTML = '<p style="color: var(--muted);">This page has not yet been written...</p>';
             }
         }
 
@@ -385,7 +385,7 @@
 
             for (const line of lines) {
                 if (line.startsWith('> 书写于') || line.startsWith('> Written at')) {
-                    timestamp = line.replace('> ', '');
+                    timestamp = line.replace('> ', '').replace('书写于 ', 'Written at ');
                 } else if (line === '---') {
                     inBody = true;
                 } else if (inBody && line.trim()) {
@@ -404,9 +404,9 @@
         }
 
         function formatTime(isoString) {
-            if (!isoString) return '尚未更新';
+            if (!isoString) return 'Not yet updated';
             const date = new Date(isoString);
-            return date.toLocaleString('zh-CN', {
+            return date.toLocaleString('en-US', {
                 month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
