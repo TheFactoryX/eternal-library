@@ -5,6 +5,10 @@ on:
     - cron: '*/15 * * * *'  # Every 15 minutes
   workflow_dispatch:         # Manual trigger
 
+concurrency:
+  group: library-pages
+  cancel-in-progress: false
+
 jobs:
   corridor-0:
     name: Corridor 0 (Chinese)
@@ -70,62 +74,149 @@ jobs:
             stacks/tome_0002/
             reading-room/library.json
 
-  push-pages:
-    name: Push Pages
+  corridor-2:
+    name: Corridor 2 (Warhol)
     runs-on: ubuntu-latest
-    needs: [corridor-0, corridor-1]
     steps:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Corridor 0 output
-        uses: actions/download-artifact@v4
+      - uses: actions/setup-python@v5
         with:
-          name: corridor-0-output
-          path: corridor-0-output
+          python-version: '3.11'
 
-      - name: Download Corridor 1 output
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Corridor 2
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+        run: |
+          for i in 1 2 3; do
+            python corridor2.py && break || sleep 10
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: corridor-2-output
+          path: |
+            stacks/tome_0003/
+            reading-room/library.json
+
+  corridor-3:
+    name: Corridor 3 (Code)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Corridor 3
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+        run: |
+          for i in 1 2 3; do
+            python corridor3.py && break || sleep 10
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: corridor-3-output
+          path: |
+            stacks/tome_0004/
+            reading-room/library.json
+
+  corridor-4:
+    name: Corridor 4 (Geography)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Corridor 4
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+        run: |
+          for i in 1 2 3; do
+            python corridor4.py && break || sleep 10
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: corridor-4-output
+          path: |
+            stacks/tome_0005/
+            reading-room/library.json
+
+  push-pages:
+    name: Push Pages
+    runs-on: ubuntu-latest
+    needs: [corridor-0, corridor-1, corridor-2, corridor-3, corridor-4]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: corridor-1-output
-          path: corridor-1-output
+          path: artifacts
 
       - name: Merge outputs
         run: |
-          # Copy tome_0001 pages
-          mkdir -p stacks/tome_0001
-          cp -r corridor-0-output/stacks/tome_0001/* stacks/tome_0001/ 2>/dev/null || true
+          # Copy all tome pages
+          for i in 0 1 2 3 4; do
+            tome_num=$((i + 1))
+            tome_id=$(printf "tome_%04d" $tome_num)
+            if [ -d "artifacts/corridor-${i}-output/stacks/${tome_id}" ]; then
+              mkdir -p "stacks/${tome_id}"
+              cp -r "artifacts/corridor-${i}-output/stacks/${tome_id}/"* "stacks/${tome_id}/" 2>/dev/null || true
+            fi
+          done
 
-          # Copy tome_0002 pages
-          mkdir -p stacks/tome_0002
-          cp -r corridor-1-output/stacks/tome_0002/* stacks/tome_0002/ 2>/dev/null || true
-
-          # Merge library.json (combine tomes from both)
+          # Merge library.json
           python3 << 'EOF'
           import json
           import os
+          from pathlib import Path
 
           library = {"tomes": [], "updated_at": None}
 
-          # Load from corridor-0
-          try:
-              with open("corridor-0-output/reading-room/library.json") as f:
-                  data = json.load(f)
-                  for tome in data.get("tomes", []):
-                      library["tomes"].append(tome)
-                  library["updated_at"] = data.get("updated_at")
-          except: pass
-
-          # Load from corridor-1
-          try:
-              with open("corridor-1-output/reading-room/library.json") as f:
-                  data = json.load(f)
-                  for tome in data.get("tomes", []):
-                      if not any(t["id"] == tome["id"] for t in library["tomes"]):
-                          library["tomes"].append(tome)
-                  library["updated_at"] = data.get("updated_at") or library["updated_at"]
-          except: pass
+          for i in range(5):
+              lib_file = Path(f"artifacts/corridor-{i}-output/reading-room/library.json")
+              if lib_file.exists():
+                  try:
+                      with open(lib_file) as f:
+                          data = json.load(f)
+                          for tome in data.get("tomes", []):
+                              if not any(t["id"] == tome["id"] for t in library["tomes"]):
+                                  library["tomes"].append(tome)
+                          if data.get("updated_at"):
+                              library["updated_at"] = data["updated_at"]
+                  except: pass
 
           os.makedirs("reading-room", exist_ok=True)
           with open("reading-room/library.json", "w") as f:
@@ -137,5 +228,8 @@ jobs:
           git config user.name "The Librarian"
           git config user.email "librarian@eternal-library.art"
           git add -A
-          git diff --staged --quiet || git commit -m "📖 New pages written"
-          git push
+          git diff --staged --quiet && echo "No changes" && exit 0
+          git commit -m "📖 New pages written"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push && break || sleep 5
+          done

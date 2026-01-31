@@ -25,6 +25,21 @@ Letters from a lighthouse keeper to an unknown recipient.
 Each chapter is a letter.
 There will never be a reply.
 
+### *The Warhol Diaries*
+Andy Warhol's diary continues.
+Every day recorded. The mundane and the extraordinary.
+Starting February 1, 2026.
+
+### *The Infinite Loop*
+Debug logs from a programmer searching for a bug in the universe.
+Part technical documentation, part philosophical meditation.
+The search never ends.
+
+### *The Wanderer's Atlas*
+Postcards from a traveler visiting impossible places.
+Each card describes somewhere that may or may not exist.
+Wish you were here.
+
 ---
 
 ## The Reading Room
@@ -43,6 +58,9 @@ It never stops.
 |----------|------|----------|
 | corridor0.py | The Labyrinth | Chinese |
 | corridor1.py | The Lighthouse Keeper's Letters | English |
+| corridor2.py | The Warhol Diaries | English |
+| corridor3.py | The Infinite Loop | English |
+| corridor4.py | The Wanderer's Atlas | English |
 
 ---
 
@@ -50,14 +68,17 @@ It never stops.
 
 ```
 eternal-library/
-├── corridor0.py          # Corridor 0
-├── corridor1.py          # Corridor 1
+├── corridor0.py          # The Labyrinth
+├── corridor1.py          # The Lighthouse Keeper's Letters
+├── corridor2.py          # The Warhol Diaries
+├── corridor3.py          # The Infinite Loop
+├── corridor4.py          # The Wanderer's Atlas
 ├── stacks/               # The Stacks
 │   ├── tome_0001/        # The Labyrinth
-│   │   ├── page_001.md
-│   │   ├── page_002.md
-│   │   └── tome.json
-│   └── tome_0002/        # The Lighthouse Keeper's Letters
+│   ├── tome_0002/        # The Lighthouse Keeper's Letters
+│   ├── tome_0003/        # The Warhol Diaries
+│   ├── tome_0004/        # The Infinite Loop
+│   └── tome_0005/        # The Wanderer's Atlas
 ├── reading-room/         # Reading Room
 │   ├── index.html
 │   └── library.json
@@ -71,8 +92,8 @@ eternal-library/
 
 GitHub Actions runs every 15 minutes.
 
-Two corridors work simultaneously.
-Two tomes grow together.
+Five corridors work simultaneously.
+Five tomes grow together.
 The library never closes.
 
 ---
