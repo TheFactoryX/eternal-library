@@ -1,4 +1,4 @@
-# 永恒图书馆
+# Eternal Library
 
 __pycache__/
 *.py[cod]
@@ -11,3 +11,7 @@ dist/
 build/
 .DS_Store
 .vercel
+
+# CI artifacts
+artifacts/
+corridor-*-output/
