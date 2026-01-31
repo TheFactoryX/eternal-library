@@ -13,10 +13,11 @@ jobs:
   corridor-0:
     name: Corridor 0 (Chinese)
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -36,19 +37,22 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: corridor-0-output
           path: |
             stacks/tome_0001/
             reading-room/library.json
+          if-no-files-found: ignore
 
   corridor-1:
     name: Corridor 1 (English)
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -68,19 +72,22 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: corridor-1-output
           path: |
             stacks/tome_0002/
             reading-room/library.json
+          if-no-files-found: ignore
 
   corridor-2:
     name: Corridor 2 (Warhol)
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -100,19 +107,22 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: corridor-2-output
           path: |
             stacks/tome_0003/
             reading-room/library.json
+          if-no-files-found: ignore
 
   corridor-3:
     name: Corridor 3 (Code)
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -132,19 +142,22 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: corridor-3-output
           path: |
             stacks/tome_0004/
             reading-room/library.json
+          if-no-files-found: ignore
 
   corridor-4:
     name: Corridor 4 (Geography)
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -164,47 +177,84 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: corridor-4-output
           path: |
             stacks/tome_0005/
             reading-room/library.json
+          if-no-files-found: ignore
 
   push-pages:
     name: Push Pages
     runs-on: ubuntu-latest
     needs: [corridor-0, corridor-1, corridor-2, corridor-3, corridor-4]
+    if: always()
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+
+      - name: Pull latest changes
+        run: |
+          git pull origin main --rebase || true
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+        continue-on-error: true
 
       - name: Merge outputs
         run: |
-          # Copy all tome pages
+          echo "=== Merging corridor outputs ==="
+
+          # List what we got
+          echo "Artifacts downloaded:"
+          ls -la artifacts/ 2>/dev/null || echo "No artifacts directory"
+
+          # Copy new pages from each corridor (merge, don't replace)
           for i in 0 1 2 3 4; do
             tome_num=$((i + 1))
             tome_id=$(printf "tome_%04d" $tome_num)
-            if [ -d "artifacts/corridor-${i}-output/stacks/${tome_id}" ]; then
+            artifact_dir="artifacts/corridor-${i}-output/stacks/${tome_id}"
+
+            if [ -d "$artifact_dir" ]; then
+              echo "Found artifact for ${tome_id}"
               mkdir -p "stacks/${tome_id}"
-              cp -r "artifacts/corridor-${i}-output/stacks/${tome_id}/"* "stacks/${tome_id}/" 2>/dev/null || true
+              # Copy new files, but don't overwrite existing (use -n flag)
+              cp -rv "$artifact_dir/"* "stacks/${tome_id}/" 2>/dev/null || true
+            else
+              echo "No artifact for corridor-${i} (${tome_id})"
             fi
           done
 
-          # Merge library.json
+          # Show current state
+          echo "=== Current stacks state ==="
+          find stacks -name "*.md" -o -name "*.json" | head -50
+
+      - name: Merge library index
+        run: |
           python3 << 'EOF'
           import json
           import os
           from pathlib import Path
+          from datetime import datetime
 
+          print("=== Merging library index ===")
+
+          # Start with existing library.json from repo
           library = {"tomes": [], "updated_at": None}
+          existing_lib = Path("reading-room/library.json")
+          if existing_lib.exists():
+              try:
+                  with open(existing_lib) as f:
+                      library = json.load(f)
+                  print(f"Loaded existing library with {len(library.get('tomes', []))} tomes")
+              except Exception as e:
+                  print(f"Error loading existing library: {e}")
 
+          # Merge from each corridor's artifact
           for i in range(5):
               lib_file = Path(f"artifacts/corridor-{i}-output/reading-room/library.json")
               if lib_file.exists():
@@ -212,24 +262,93 @@ jobs:
                       with open(lib_file) as f:
                           data = json.load(f)
                           for tome in data.get("tomes", []):
-                              if not any(t["id"] == tome["id"] for t in library["tomes"]):
+                              # Update existing tome or add new one
+                              found = False
+                              for j, existing_tome in enumerate(library.get("tomes", [])):
+                                  if existing_tome.get("id") == tome.get("id"):
+                                      # Update with newer data (more pages)
+                                      if tome.get("pages", 0) >= existing_tome.get("pages", 0):
+                                          library["tomes"][j] = tome
+                                          print(f"Updated {tome.get('id')}: {tome.get('pages')} pages")
+                                      found = True
+                                      break
+                              if not found:
                                   library["tomes"].append(tome)
+                                  print(f"Added new tome {tome.get('id')}: {tome.get('pages')} pages")
                           if data.get("updated_at"):
                               library["updated_at"] = data["updated_at"]
-                  except: pass
+                  except Exception as e:
+                      print(f"Error loading corridor-{i} library: {e}")
+
+          # Also scan stacks directory for any tomes we might have missed
+          stacks_dir = Path("stacks")
+          if stacks_dir.exists():
+              for tome_dir in sorted(stacks_dir.iterdir()):
+                  if tome_dir.is_dir() and tome_dir.name.startswith("tome_"):
+                      tome_json = tome_dir / "tome.json"
+                      if tome_json.exists():
+                          try:
+                              with open(tome_json) as f:
+                                  tome_data = json.load(f)
+                                  tome_id = tome_data.get("id", tome_dir.name)
+                                  # Check if already in library
+                                  found = False
+                                  for j, existing_tome in enumerate(library.get("tomes", [])):
+                                      if existing_tome.get("id") == tome_id:
+                                          # Update if this has more pages
+                                          if tome_data.get("pages", 0) > existing_tome.get("pages", 0):
+                                              # Remove background from index
+                                              index_data = {k: v for k, v in tome_data.items() if k != "background"}
+                                              library["tomes"][j] = index_data
+                                              print(f"Updated from stacks {tome_id}: {tome_data.get('pages')} pages")
+                                          found = True
+                                          break
+                                  if not found:
+                                      index_data = {k: v for k, v in tome_data.items() if k != "background"}
+                                      library["tomes"].append(index_data)
+                                      print(f"Added from stacks {tome_id}: {tome_data.get('pages')} pages")
+                          except Exception as e:
+                              print(f"Error loading {tome_json}: {e}")
+
+          library["updated_at"] = datetime.now().isoformat()
 
           os.makedirs("reading-room", exist_ok=True)
           with open("reading-room/library.json", "w") as f:
               json.dump(library, f, ensure_ascii=False, indent=2)
+
+          print(f"=== Final library: {len(library.get('tomes', []))} tomes ===")
+          for tome in library.get("tomes", []):
+              print(f"  - {tome.get('title')}: {tome.get('pages')} pages")
           EOF
 
       - name: Push pages
         run: |
           git config user.name "The Librarian"
           git config user.email "librarian@eternal-library.art"
+
+          # Add all changes
           git add -A
-          git diff --staged --quiet && echo "No changes" && exit 0
+
+          # Check if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          # Commit
           git commit -m "📖 New pages written"
-          for i in 1 2 3; do
-            git pull --rebase origin main && git push && break || sleep 5
+
+          # Push with retry
+          for i in 1 2 3 4 5; do
+            echo "Push attempt $i..."
+            git pull --rebase origin main || true
+            if git push origin main; then
+              echo "Push successful!"
+              exit 0
+            fi
+            echo "Push failed, retrying in 5 seconds..."
+            sleep 5
           done
+
+          echo "All push attempts failed"
+          exit 1
