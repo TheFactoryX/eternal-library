@@ -2,12 +2,12 @@ name: Corridor Switch
 
 on:
   schedule:
-    - cron: '*/15 * * * *'  # 每15分钟，轮回一次
-  workflow_dispatch:         # 手动触发
+    - cron: '*/15 * * * *'  # Every 15 minutes
+  workflow_dispatch:         # Manual trigger
 
 jobs:
-  write-pages:
-    name: 图书管理员工作
+  corridor-0:
+    name: Corridor 0 (Chinese)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Corridor 0 (Chinese Tome)
+      - name: Run Corridor 0
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
@@ -30,7 +30,30 @@ jobs:
             python corridor0.py && break || sleep 10
           done
 
-      - name: Run Corridor 1 (English Tome)
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: corridor-0-output
+          path: |
+            stacks/tome_0001/
+            reading-room/library.json
+
+  corridor-1:
+    name: Corridor 1 (English)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Corridor 1
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
@@ -38,6 +61,76 @@ jobs:
           for i in 1 2 3; do
             python corridor1.py && break || sleep 10
           done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: corridor-1-output
+          path: |
+            stacks/tome_0002/
+            reading-room/library.json
+
+  push-pages:
+    name: Push Pages
+    runs-on: ubuntu-latest
+    needs: [corridor-0, corridor-1]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Corridor 0 output
+        uses: actions/download-artifact@v4
+        with:
+          name: corridor-0-output
+          path: corridor-0-output
+
+      - name: Download Corridor 1 output
+        uses: actions/download-artifact@v4
+        with:
+          name: corridor-1-output
+          path: corridor-1-output
+
+      - name: Merge outputs
+        run: |
+          # Copy tome_0001 pages
+          mkdir -p stacks/tome_0001
+          cp -r corridor-0-output/stacks/tome_0001/* stacks/tome_0001/ 2>/dev/null || true
+
+          # Copy tome_0002 pages
+          mkdir -p stacks/tome_0002
+          cp -r corridor-1-output/stacks/tome_0002/* stacks/tome_0002/ 2>/dev/null || true
+
+          # Merge library.json (combine tomes from both)
+          python3 << 'EOF'
+          import json
+          import os
+
+          library = {"tomes": [], "updated_at": None}
+
+          # Load from corridor-0
+          try:
+              with open("corridor-0-output/reading-room/library.json") as f:
+                  data = json.load(f)
+                  for tome in data.get("tomes", []):
+                      library["tomes"].append(tome)
+                  library["updated_at"] = data.get("updated_at")
+          except: pass
+
+          # Load from corridor-1
+          try:
+              with open("corridor-1-output/reading-room/library.json") as f:
+                  data = json.load(f)
+                  for tome in data.get("tomes", []):
+                      if not any(t["id"] == tome["id"] for t in library["tomes"]):
+                          library["tomes"].append(tome)
+                  library["updated_at"] = data.get("updated_at") or library["updated_at"]
+          except: pass
+
+          os.makedirs("reading-room", exist_ok=True)
+          with open("reading-room/library.json", "w") as f:
+              json.dump(library, f, ensure_ascii=False, indent=2)
+          EOF
 
       - name: Push pages
         run: |
