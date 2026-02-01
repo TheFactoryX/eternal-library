@@ -1,5 +1,11 @@
 # 📖 The Eternal Library
 
+[![ANTI-LICENSE](https://img.shields.io/badge/ANTI--LICENSE-STEAL_THIS-000000?style=for-the-badge&labelColor=dc143c)](LICENSE)
+[![Machine Status](https://img.shields.io/github/actions/workflow/status/TheFactoryX/eternal-library/corridor-switch.yml?style=flat-square&label=librarian)](https://github.com/TheFactoryX/eternal-library/actions)
+[![GitHub Stars](https://img.shields.io/github/stars/TheFactoryX/eternal-library?style=flat-square&logo=github)](https://github.com/TheFactoryX/eternal-library/stargazers)
+[![Last Commit](https://img.shields.io/github/last-commit/TheFactoryX/eternal-library?style=flat-square)](https://github.com/TheFactoryX/eternal-library/commits)
+[![TheFactoryX](https://img.shields.io/badge/TheFactoryX-black?style=flat-square&logo=github)](https://github.com/TheFactoryX)
+
 > *"The Library is unlimited and cyclical."*
 > — Borges
 
@@ -97,6 +103,12 @@ Five tomes grow together.
 The library never closes.
 
 ---
+
+---
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=TheFactoryX/eternal-library&type=Date)](https://star-history.com/#TheFactoryX/eternal-library&Date)
 
 ---
 
