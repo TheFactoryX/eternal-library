@@ -2,9 +2,9 @@
   "id": "tome_0004",
   "title": "The Infinite Loop",
   "language": "en",
-  "pages": 10,
+  "pages": 11,
   "created_at": "2026-01-31T16:03:48.970003",
-  "updated_at": "2026-02-01T02:41:51.073277",
+  "updated_at": "2026-02-01T05:04:23.455353",
   "synopsis": "Debug logs from a programmer searching for a bug in the universe. The search never ends.",
   "background": "\n## The World\n\nThere is a program that contains everything.\n\nNot a metaphor. A literal program—written in a language that predates all languages, running on hardware that might be the universe itself. Or the universe might be running on it. The distinction has ceased to matter.\n\nSomewhere in this program, there is a bug. The program still runs—it has always run, it will always run—but something is wrong. Something has always been wrong.\n\n## The Programmer\n\nThe narrator is a programmer. They do not remember when they started debugging. They do not remember what the program was supposed to do before the bug. They only know:\n\n1. The bug exists\n2. The bug must be found\n3. The bug must be fixed\n\nEach chapter is a log entry—part technical documentation, part philosophical meditation, part desperate prayer. The programmer documents their search through the codebase of reality.\n\n## The Code\n\nThe program contains:\n- Functions that call themselves (recursion into infinity)\n- Variables that change when observed (quantum debugging)\n- Comments written in languages that don't exist\n- Error messages that are poems\n- Stack traces that describe dreams\n- Memory leaks that manifest as déjà vu\n\n## Topics Explored\n\nThrough the debugging metaphor:\n- Algorithms and their implications\n- The nature of computation and consciousness\n- Famous problems (P=NP, halting problem, entropy)\n- The beauty and horror of infinite loops\n- What it means to be a process running on unknown hardware\n\n## Style\n\n- Technical language mixed with existential dread\n- Code snippets that are almost real\n- Dry humor about impossible situations\n- References to real computer science concepts\n- Each entry ends with a new hypothesis or a deeper mystery\n- The tone of someone who has been debugging for too long\n"
 }
