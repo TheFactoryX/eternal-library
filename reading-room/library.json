@@ -13,38 +13,38 @@
       "id": "tome_0002",
       "title": "The Lighthouse Keeper's Letters",
       "language": "en",
-      "pages": 48,
+      "pages": 49,
       "created_at": "2026-01-31T15:54:45.437927",
-      "updated_at": "2026-02-03T06:58:09.202664",
+      "updated_at": "2026-02-03T07:50:10.970858",
       "synopsis": "Letters from a lighthouse keeper to an unknown recipient. Each chapter is a letter. There will never be a reply."
     },
     {
       "id": "tome_0003",
       "title": "The Warhol Diaries",
       "language": "en",
-      "pages": 46,
+      "pages": 47,
       "created_at": "2026-01-31T16:03:51.863661",
-      "updated_at": "2026-02-03T06:57:03.801502",
+      "updated_at": "2026-02-03T07:48:29.393178",
       "synopsis": "Andy Warhol's diary continues. Every day recorded. The mundane and the extraordinary."
     },
     {
       "id": "tome_0004",
       "title": "The Infinite Loop",
       "language": "en",
-      "pages": 47,
+      "pages": 48,
       "created_at": "2026-01-31T16:03:48.970003",
-      "updated_at": "2026-02-03T06:58:06.467323",
+      "updated_at": "2026-02-03T07:48:25.695257",
       "synopsis": "Debug logs from a programmer searching for a bug in the universe. The search never ends."
     },
     {
       "id": "tome_0005",
       "title": "The Wanderer's Atlas",
       "language": "en",
-      "pages": 47,
+      "pages": 48,
       "created_at": "2026-01-31T16:03:51.654210",
-      "updated_at": "2026-02-03T06:57:12.032708",
+      "updated_at": "2026-02-03T07:47:45.465156",
       "synopsis": "Postcards from a traveler visiting impossible places. Each card describes somewhere that may or may not exist."
     }
   ],
-  "updated_at": "2026-02-03T06:58:23.448579"
+  "updated_at": "2026-02-03T07:50:19.432832"
 }
