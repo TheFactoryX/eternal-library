@@ -4,47 +4,47 @@
       "id": "tome_0001",
       "title": "迷楼记",
       "language": "zh",
-      "pages": 71,
+      "pages": 72,
       "created_at": "2026-01-31T15:54:21.189386",
-      "updated_at": "2026-02-04T11:36:18.520272",
+      "updated_at": "2026-02-04T13:07:34.875329",
       "synopsis": "一个人在不断变化的建筑中迷失。每一章是一个新的房间。永远找不到出口。"
     },
     {
       "id": "tome_0002",
       "title": "The Lighthouse Keeper's Letters",
       "language": "en",
-      "pages": 72,
+      "pages": 73,
       "created_at": "2026-01-31T15:54:45.437927",
-      "updated_at": "2026-02-04T11:36:04.389201",
+      "updated_at": "2026-02-04T13:07:24.086815",
       "synopsis": "Letters from a lighthouse keeper to an unknown recipient. Each chapter is a letter. There will never be a reply."
     },
     {
       "id": "tome_0003",
       "title": "The Warhol Diaries",
       "language": "en",
-      "pages": 68,
+      "pages": 69,
       "created_at": "2026-01-31T16:03:51.863661",
-      "updated_at": "2026-02-04T11:35:58.810816",
+      "updated_at": "2026-02-04T13:07:05.096850",
       "synopsis": "Andy Warhol's diary continues. Every day recorded. The mundane and the extraordinary."
     },
     {
       "id": "tome_0004",
       "title": "The Infinite Loop",
       "language": "en",
-      "pages": 68,
+      "pages": 69,
       "created_at": "2026-01-31T16:03:48.970003",
-      "updated_at": "2026-02-04T11:36:05.782947",
+      "updated_at": "2026-02-04T13:07:10.656064",
       "synopsis": "Debug logs from a programmer searching for a bug in the universe. The search never ends."
     },
     {
       "id": "tome_0005",
       "title": "The Wanderer's Atlas",
       "language": "en",
-      "pages": 71,
+      "pages": 72,
       "created_at": "2026-01-31T16:03:51.654210",
-      "updated_at": "2026-02-04T11:35:51.670409",
+      "updated_at": "2026-02-04T13:07:33.763181",
       "synopsis": "Postcards from a traveler visiting impossible places. Each card describes somewhere that may or may not exist."
     }
   ],
-  "updated_at": "2026-02-04T11:36:29.546574"
+  "updated_at": "2026-02-04T13:07:47.562684"
 }
